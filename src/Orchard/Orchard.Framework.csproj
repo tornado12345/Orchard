@@ -84,8 +84,8 @@
       <Private>True</Private>
     </Reference>
     <Reference Include="Microsoft.CSharp" />
-    <Reference Include="Microsoft.Owin, Version=3.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>..\packages\Microsoft.Owin.3.0.0\lib\net45\Microsoft.Owin.dll</HintPath>
+    <Reference Include="Microsoft.Owin, Version=3.0.1.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Owin.3.0.1\lib\net45\Microsoft.Owin.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="Microsoft.Web.Infrastructure, Version=1.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
@@ -127,6 +127,7 @@
     <Reference Include="System.Runtime.Serialization">
       <RequiredTargetFramework>3.0</RequiredTargetFramework>
     </Reference>
+    <Reference Include="System.Security" />
     <Reference Include="System.ServiceModel" />
     <Reference Include="System.ServiceModel.Activation" />
     <Reference Include="System.Transactions" />
@@ -174,6 +175,9 @@
   <ItemGroup>
     <Compile Include="ContentManagement\Extensions\DriverResultExtensions.cs" />
     <Compile Include="ContentManagement\Handlers\CloneContentContext.cs" />
+    <Compile Include="ContentManagement\IGlobalCriteriaProvider.cs" />
+    <Compile Include="DisplayManagement\Descriptors\ShapePlacementStrategy\DefaultPlacementParseMatchProviders.cs" />
+    <Compile Include="DisplayManagement\Descriptors\ShapePlacementStrategy\IPlacementParseMatchProvider.cs" />
     <Compile Include="Environment\Configuration\ExtensionLocations.cs" />
     <Compile Include="DisplayManagement\IPositioned.cs" />
     <Compile Include="DisplayManagement\PositionWrapper.cs" />
@@ -190,12 +194,16 @@
     <Compile Include="Recipes\Models\BuildContext.cs" />
     <Compile Include="Recipes\Services\IRecipeBuilder.cs" />
     <Compile Include="Recipes\Services\IRecipeBuilderStep.cs" />
+    <Compile Include="Recipes\Services\IRecipeBuilderStepResolver.cs" />
     <Compile Include="Recipes\Services\IRecipeExecutionStep.cs" />
+    <Compile Include="Recipes\Services\IRecipeExecutionStepResolver.cs" />
     <Compile Include="Recipes\Services\IRecipeExecutor.cs" />
     <Compile Include="Recipes\Services\IRecipeResultAccessor.cs" />
     <Compile Include="Recipes\Services\RecipeBuilder.cs" />
     <Compile Include="Recipes\Services\RecipeBuilderStep.cs" />
     <Compile Include="Recipes\Models\RecipeExecutionContext.cs" />
+    <Compile Include="Recipes\Services\RecipeExecutionStepResolver.cs" />
+    <Compile Include="Recipes\Services\RecipeBuilderStepResolver.cs" />
     <Compile Include="Recipes\Services\RecipeExecutionLogger.cs" />
     <Compile Include="Recipes\Services\RecipeExecutionStep.cs" />
     <Compile Include="Recipes\Services\RecipeExecutor.cs" />
@@ -214,8 +222,12 @@
     <Compile Include="Localization\Services\ILocalizationStreamParser.cs" />
     <Compile Include="Localization\Services\LocalizationStreamParser.cs" />
     <Compile Include="Mvc\Html\LinkExtensions.cs" />
+    <Compile Include="Security\ISecurityService.cs" />
     <Compile Include="Security\ISslSettingsProvider.cs" />
+    <Compile Include="Security\IUserDataProvider.cs" />
     <Compile Include="Security\NullMembershipService.cs" />
+    <Compile Include="Security\Providers\BaseUserDataProvider.cs" />
+    <Compile Include="Security\Providers\DefaultSecurityService.cs" />
     <Compile Include="Security\Providers\DefaultSslSettingsProvider.cs" />
     <Compile Include="Security\Providers\DefaultMembershipValidationService.cs" />
     <Compile Include="Caching\DefaultCacheContextAccessor.cs" />
@@ -420,6 +432,7 @@
     <Compile Include="Security\IEncryptionService.cs" />
     <Compile Include="Security\CurrentUserWorkContext.cs" />
     <Compile Include="Security\Providers\DefaultEncryptionService.cs" />
+    <Compile Include="Security\Providers\TenantNameUserDataProvider.cs" />
     <Compile Include="Services\Clock.cs" />
     <Compile Include="Services\ClientHostAddressAccessor.cs" />
     <Compile Include="Services\DefaultJsonConverter.cs" />
@@ -446,7 +459,9 @@
     <Compile Include="UI\Navigation\NavigationHelper.cs" />
     <Compile Include="UI\Navigation\Pager.cs" />
     <Compile Include="UI\Navigation\PagerParameters.cs" />
+    <Compile Include="UI\Resources\IResourceFileHashProvider.cs" />
     <Compile Include="UI\Resources\IResourceManifestProvider.cs" />
+    <Compile Include="UI\Resources\ResourceFileHashProvider.cs" />
     <Compile Include="UI\Resources\ResourceManifestBuilder.cs" />
     <Compile Include="UI\Zones\LayoutWorkContext.cs" />
     <Compile Include="UI\Zones\ZoneHoldingBehavior.cs" />
@@ -1081,11 +1096,4 @@
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
-       Other similar extension points exist, see Microsoft.Common.targets.
-  <Target Name="BeforeBuild">
-  </Target>
-  <Target Name="AfterBuild">
-  </Target>
-  -->
 </Project>

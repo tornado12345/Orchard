@@ -33,7 +33,7 @@ namespace Orchard.ContentManagement {
         private readonly ICacheManager _cacheManager;
         private readonly Func<IContentManagerSession> _contentManagerSession;
         private readonly Lazy<IContentDisplay> _contentDisplay;
-        private readonly Lazy<ITransactionManager> _transactionManager; 
+        private readonly Lazy<ITransactionManager> _transactionManager;
         private readonly Lazy<IEnumerable<IContentHandler>> _handlers;
         private readonly Lazy<IEnumerable<IIdentityResolverSelector>> _identityResolverSelectors;
         private readonly Lazy<IEnumerable<ISqlStatementProvider>> _sqlStatementProviders;
@@ -78,7 +78,11 @@ namespace Orchard.ContentManagement {
         public ILogger Logger { get; set; }
 
         public IEnumerable<IContentHandler> Handlers {
-              get { return _handlers.Value; }
+            get { return _handlers.Value; }
+        }
+
+        public ITransactionManager TransactionManager {
+            get { return _transactionManager.Value; }
         }
 
         public IEnumerable<ContentTypeDefinition> GetContentTypeDefinitions() {
@@ -445,6 +449,21 @@ namespace Orchard.ContentManagement {
             Handlers.Invoke(handler => handler.Removed(context), Logger);
         }
 
+        public virtual void DiscardDraft(ContentItem contentItem) {
+            var session = _transactionManager.Value.GetSession();
+
+            // Delete the draft content item version record.
+            session
+                .CreateQuery("delete from Orchard.ContentManagement.Records.ContentItemVersionRecord civ where civ.ContentItemRecord.Id = (:id) and civ.Published = false and civ.Latest = true")
+                .SetParameter("id", contentItem.Id)
+                .ExecuteUpdate();
+
+            // After deleting the draft, get the published version. If for any reason there would be more than one,
+            // get the last one and set the Latest property to true.
+            var publishedVersionRecord = contentItem.Record.Versions.OrderBy(x => x.Number).ToArray().Last();
+            publishedVersionRecord.Latest = true;
+        }
+
         public virtual void Destroy(ContentItem contentItem) {
             var session = _transactionManager.Value.GetSession();
             var context = new DestroyContentContext(contentItem);
@@ -569,13 +588,10 @@ namespace Orchard.ContentManagement {
             Create(cloneContentItem, VersionOptions.Draft);
 
             var context = new CloneContentContext(contentItem, cloneContentItem);
-            foreach (var contentHandler in Handlers) {
-                contentHandler.Cloning(context);
-            }
 
-            foreach (var contentHandler in Handlers) {
-                contentHandler.Cloned(context);
-            }
+            Handlers.Invoke(handler => handler.Cloning(context), Logger);
+
+            Handlers.Invoke(handler => handler.Cloned(context), Logger);
 
             return cloneContentItem;
         }
